@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ellsworth Springs Neighborhood Newsletter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-deep: #2D6A4F;
+      --green-mid: #40916C;
+      --green-light: #B7E4C7;
+      --yellow: #FFD166;
+      --orange: #F4845F;
+      --cream: #FFFBF2;
+      --bark: #6B4226;
+      --text: #1A2E22;
+      --muted: #5A7566;
+      --white: #ffffff;
+      --card-bg: #ffffff;
+      --shadow: 0 2px 16px rgba(45,106,79,0.10);
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--green-deep) 0%, var(--green-mid) 100%);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-leaves {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cellipse cx='40' cy='40' rx='18' ry='34' fill='white' transform='rotate(-30 40 40)'/%3E%3Cellipse cx='20' cy='20' rx='12' ry='22' fill='white' transform='rotate(20 20 20)'/%3E%3Cellipse cx='65' cy='60' rx='10' ry='18' fill='white' transform='rotate(-50 65 60)'/%3E%3C/svg%3E");
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    .header-inner {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 36px 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .header-logo-wrap {
+      flex-shrink: 0;
+      width: 88px;
+      height: 88px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      overflow: hidden;
+      border: 3px solid var(--yellow);
+    }
+
+    .header-logo-wrap img {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+    }
+
+    .header-text { flex: 1; }
+
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 4px;
+    }
+
+    .header-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.5rem, 4vw, 2.1rem);
+      font-weight: 600;
+      color: white;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--green-light);
+      font-weight: 600;
+    }
+
+    .edition-bar {
+      background: var(--yellow);
+      text-align: center;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--bark);
+      letter-spacing: 0.05em;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    #loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--green-light);
+      border-top-color: var(--green-mid);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error-state {
+      display: none;
+      background: #FFF0ED;
+      border: 2px solid var(--orange);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      color: var(--bark);
+    }
+
+    .hero-article {
+      background: var(--card-bg);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 28px;
+      border-top: 5px solid var(--green-mid);
+    }
+
+    .hero-article-body { padding: 28px 30px 24px; }
+
+    .article-tag {
+      display: inline-block;
+      background: var(--green-light);
+      color: var(--green-deep);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+
+    .hero-article h2 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .hero-article p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: #3A4A3F;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .article-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 22px 22px 20px;
+      border-left: 4px solid var(--green-light);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .article-card:hover {
+      border-left-color: var(--orange);
+      transform: translateY(-2px);
+    }
+
+    .article-card h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .article-card p {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: #4A5E50;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-label-text {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--green-mid);
+    }
+
+    .section-label-line {
+      flex: 1;
+      height: 2px;
+      background: var(--green-light);
+      border-radius: 2px;
+    }
+
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .event-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .event-date-badge {
+      flex-shrink: 0;
+      width: 50px;
+      background: var(--green-deep);
+      color: white;
+      border-radius: 10px;
+      text-align: center;
+      padding: 6px 4px;
+    }
+
+    .event-date-badge .month {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--yellow);
+    }
+
+    .event-date-badge .day {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .event-info h4 {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .event-info p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .notice-box {
+      background: linear-gradient(135deg, #FFF8E1 0%, #FFFBF2 100%);
+      border: 2px solid var(--yellow);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .notice-icon { font-size: 24px; flex-shrink: 0; }
+
+    .notice-box h4 {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--bark);
+      margin-bottom: 4px;
+    }
+
+    .notice-box p {
+      font-size: 13px;
+      color: #6B5230;
+      line-height: 1.6;
+    }
+
+    footer {
+      background: var(--green-deep);
+      color: var(--green-light);
+      text-align: center;
+      padding: 28px 20px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    footer strong { color: white; }
+    footer a { color: var(--yellow); text-decoration: none; }
+
+    .setup-notice {
+      background: #EAF4FF;
+      border: 2px dashed #90C4F0;
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      color: #1A5276;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .setup-notice strong { display: block; font-size: 15px; margin-bottom: 6px; }
+    .setup-notice code {
+      background: #D6EAF8;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 540px) {
+      .header-inner { flex-direction: column; text-align: center; gap: 14px; }
+      .header-logo-wrap { width: 72px; height: 72px; }
+      .header-logo-wrap img { width: 62px; height: 62px; }
+      .hero-article-body { padding: 20px 18px; }
+      .article-card { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-leaves"></div>
+  <div class="header-inner">
+    <div class="header-logo-wrap">
+      <img
+        src="https://ugc.production.linktr.ee/acfbd2b1-8911-44d1-a546-dc2448581b63_9Id-O6MvSG10yHUqACl80Wb-MdlBs6AFaL47eXVcUAtDh1F9jdbJtPZyTIfEPQZY7i6susQRzT0-s900-c-k-c0x00ffffff-no-.jpeg?io=true&size=avatar-v3_0"
+        alt="City of Vancouver Seal"
+        onerror="this.style.display='none'; this.parentNode.innerHTML='🌲';"
+      />
+    </div>
+    <div class="header-text">
+      <div class="header-eyebrow">Vancouver, WA · Clark County</div>
+      <div class="header-title">Ellsworth Springs<br>Neighborhood Association</div>
+      <div class="header-subtitle">Connecting neighbors · Building community</div>
+    </div>
+  </div>
+</header>
+
+<div class="edition-bar" id="edition-bar">
+  📬 Loading latest newsletter...
+</div>
+
+<main>
+  <div id="loading-state">
+    <div class="spinner"></div>
+    Fetching the latest edition...
+  </div>
+
+  <div id="error-state">
+    <strong>⚠️ Couldn't load newsletter content</strong>
+    <p style="margin-top:8px; font-size:13px;">Check that your Google Sheet is published and the URL is correct.</p>
+  </div>
+
+  <div id="newsletter-content" style="display:none;"></div>
+
+  <div class="setup-notice" id="setup-notice">
+    <strong>📋 Connect Your Google Sheet</strong>
+    To populate this newsletter automatically, publish your Google Sheet as CSV and paste the URL into this file.<br><br>
+    <strong>Steps:</strong><br>
+    1. Create a Google Sheet with columns: <code>type</code>, <code>title</code>, <code>body</code>, <code>date</code>, <code>extra</code><br>
+    2. File → Share → Publish to web → CSV<br>
+    3. Copy the URL and replace <code>SHEET_CSV_URL</code> in the script below<br><br>
+    <strong>Row types:</strong> <code>hero</code> · <code>article</code> · <code>event</code> · <code>notice</code> · <code>edition</code>
+  </div>
+</main>
+
+<div style="background:#1A3D2B; padding: 28px 20px 12px; text-align:center;">
+  <div style="color:#B7E4C7; font-size:13px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:14px;">📬 Subscribe to get email updates</div>
+  <div id="qr-footer" style="display:inline-block; background:white; padding:12px; border-radius:12px; margin-bottom:12px;"></div>
+  <div style="color:#B7E4C7; font-size:12px; margin-bottom:20px;">Scan with your phone camera to subscribe</div>
+</div>
+<footer>
+  <strong>Ellsworth Springs Neighborhood Association</strong><br>
+  Vancouver, Washington · Clark County<br>
+  Questions? <a href="mailto:ellsworthsprings@example.com">ellsworthsprings@example.com</a><br>
+  <span style="opacity:0.6; font-size:11px;">Newsletter auto-generated from community submissions</span>
+</footer>
+
+<script>
+  // ── CONFIGURATION ──────────────────────────────────────────────
+  const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR15-UckpBqcQPbbJff3F_zB81UlWLHydHyrmoGd9dAEcuSf-hsjy30OgSL95pC10EjfAK-YPRJVI-g/pub?output=csv';
+
+  // ── SAMPLE CONTENT (shown when no Sheet is connected) ──────────
+  const SAMPLE_DATA = [
+    { type: 'edition', title: 'June 2026', body: '', date: '', extra: '' },
+    { type: 'hero', title: 'Welcome to the Ellsworth Springs Newsletter!', body: 'This is your neighborhood\'s central hub for updates, events, and community news. Once connected to your Google Sheet, every edition will publish automatically here — and eventually to email, Facebook, and X as well. We\'re excited to build this community together.', date: '', extra: 'Community Update' },
+    { type: 'article', title: 'Summer Road Maintenance Schedule', body: 'Clark County Public Works has announced paving work along NE 112th Ave beginning July 8th. Expect minor delays between 7am–4pm on weekdays. Access to all driveways will be maintained.', date: '', extra: '' },
+    { type: 'article', title: 'Lost Pet Corner', body: 'A friendly tabby cat was found near the corner of NE 94th St. If this is your cat, please reach out to the contact on our Facebook group. Always check Nextdoor for the latest lost & found posts.', date: '', extra: '' },
+    { type: 'event', title: 'Neighborhood Cleanup Day', body: 'Join your neighbors for a morning of tidying up our common areas. Gloves and bags provided. Coffee and donuts after!', date: 'Jun 28', extra: '9:00 AM · Ellsworth Springs Park' },
+    { type: 'event', title: 'July 4th Block Party Planning Meeting', body: 'Help plan the annual 4th of July celebration. All ideas welcome!', date: 'Jul 2', extra: '6:30 PM · Community Room' },
+    { type: 'notice', title: 'Reminder: Fireworks Rules in Clark County', body: 'Personal fireworks are permitted July 4th only, 9am–11pm. Please be considerate of pets and neighbors. Report illegal fireworks to Clark County non-emergency: (360) 693-3111.', date: '', extra: '' },
+  ];
+
+  // ── HELPERS ────────────────────────────────────────────────────
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    return lines.slice(1).map(line => {
+      const vals = line.match(/(".*?"|[^,]+)(?=,|$)/g) || [];
+      const obj = {};
+      headers.forEach((h, i) => {
+        obj[h] = (vals[i] || '').replace(/^"|"$/g, '').trim();
+      });
+      return obj;
+    });
+  }
+
+  function renderNewsletter(rows) {
+    const editionRow = rows.find(r => r.type === 'edition');
+    if (editionRow) {
+      document.getElementById('edition-bar').textContent = '📬 ' + editionRow.title + ' Edition';
+    }
+
+    const heroRow = rows.find(r => r.type === 'hero');
+    const articles = rows.filter(r => r.type === 'article');
+    const events = rows.filter(r => r.type === 'event');
+    const notices = rows.filter(r => r.type === 'notice');
+
+    let html = '';
+
+    if (heroRow) {
+      html += '<div class="hero-article"><div class="hero-article-body">';
+      if (heroRow.extra) html += '<span class="article-tag">' + heroRow.extra + '</span>';
+      html += '<h2>' + heroRow.title + '</h2><p>' + heroRow.body + '</p></div></div>';
+    }
+
+    notices.forEach(n => {
+      html += '<div class="notice-box"><div class="notice-icon">📢</div><div><h4>' + n.title + '</h4><p>' + n.body + '</p></div></div>';
+    });
+
+    if (articles.length) {
+      html += '<div class="section-label"><span class="section-label-text">Neighborhood News</span><div class="section-label-line"></div></div>';
+      html += '<div class="articles-grid">';
+      articles.forEach(a => {
+        html += '<div class="article-card">';
+        if (a.extra) html += '<span class="article-tag">' + a.extra + '</span>';
+        html += '<h3>' + a.title + '</h3><p>' + a.body + '</p></div>';
+      });
+      html += '</div>';
+    }
+
+    if (events.length) {
+      html += '<div class="section-label"><span class="section-label-text">Upcoming Events</span><div class="section-label-line"></div></div>';
+      html += '<div class="events-list">';
+      events.forEach(e => {
+        const parts = e.date ? e.date.split(' ') : [];
+        const month = parts[0] || '';
+        const day = parts[1] || '—';
+        html += '<div class="event-item"><div class="event-date-badge"><div class="month">' + month + '</div><div class="day">' + day + '</div></div>';
+        html += '<div class="event-info"><h4>' + e.title + '</h4><p>' + e.body + (e.extra ? '<br><strong>' + e.extra + '</strong>' : '') + '</p></div></div>';
+      });
+      html += '</div>';
+    }
+
+    document.getElementById('newsletter-content').innerHTML = html;
+    document.getElementById('newsletter-content').style.display = 'block';
+    document.getElementById('loading-state').style.display = 'none';
+  }
+
+  // ── INIT ───────────────────────────────────────────────────────
+  async function init() {
+    if (!SHEET_CSV_URL) {
+      renderNewsletter(SAMPLE_DATA);
+      return;
+    }
+
+    try {
+      const res = await fetch(SHEET_CSV_URL);
+      if (!res.ok) throw new Error('Fetch failed');
+      const text = await res.text();
+      const rows = parseCSV(text);
+      renderNewsletter(rows);
+      document.getElementById('setup-notice').style.display = 'none';
+    } catch (err) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+      renderNewsletter(SAMPLE_DATA);
+    }
+  }
+
+  init();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" onload="new QRCode(document.getElementById('qr-footer'), {text:'mailto:junk.keck@gmail.com?subject=Subscribe: Ellsworth Springs Newsletter',width:160,height:160,colorDark:'#2D6A4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})"></script>
+</body>
+</html>
